@@ -60,14 +60,8 @@ function getRuntimeApiBaseUrl(): string | undefined {
   return url;
 }
 
-/**
- * Get the API base URL, handling both web and native environments
- * In native, you may want to use a different URL or read from Capacitor config
- */
-export function getApiBaseUrl(): string {
-  const selectedUrl = getSelectedServerUrl();
-  if (selectedUrl) return selectedUrl;
-
+/** The server configured for this build, before a native user selects another. */
+export function getDefaultApiBaseUrl(): string {
   const runtimeUrl = getRuntimeApiBaseUrl();
   if (runtimeUrl) {
     return runtimeUrl;
@@ -88,4 +82,9 @@ export function getApiBaseUrl(): string {
   }
 
   return 'http://localhost:3000';
+}
+
+/** Get the API base URL, including a user-selected server in native apps. */
+export function getApiBaseUrl(): string {
+  return getSelectedServerUrl() ?? getDefaultApiBaseUrl();
 }

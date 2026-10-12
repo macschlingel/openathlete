@@ -3,11 +3,8 @@ import whiteLogoSrc from '@/assets/logos/logo_white.svg';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import { m } from '@/paraglide/messages';
-import { isCapacitor } from '@/utils/capacitor';
-import {
-  getSelectedServerUrl,
-  openServerSelection,
-} from '@/utils/mobile-server';
+import { getApiBaseUrl, isCapacitor } from '@/utils/capacitor';
+import { openServerSelection } from '@/utils/mobile-server';
 import { Link } from 'react-router-dom';
 
 interface P {
@@ -52,7 +49,7 @@ export function AuthLayout({ children }: P) {
           <div className="w-full max-w-xs space-y-4">
             {isCapacitor() && (
               <p className="truncate text-center text-xs text-muted-foreground">
-                {getSelectedServerUrl()}
+                {getApiBaseUrl()}
               </p>
             )}
             {children}

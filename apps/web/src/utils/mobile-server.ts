@@ -2,17 +2,12 @@ import { Capacitor } from '@capacitor/core';
 
 import { MOBILE_SERVER_URL } from './local-storage';
 
-export const CLOUD_API_URL = 'https://api.openathlete.org';
 const OPEN_SERVER_SELECTION = 'openathlete:open-server-selection';
 
 export function getSelectedServerUrl(): string | null {
   if (!Capacitor.isNativePlatform() || typeof localStorage === 'undefined')
     return null;
   return localStorage.getItem(MOBILE_SERVER_URL);
-}
-
-export function hasSelectedServer(): boolean {
-  return getSelectedServerUrl() !== null;
 }
 
 export function openServerSelection(): void {
@@ -68,11 +63,17 @@ export async function resolveServerUrl(input: string): Promise<string> {
 }
 
 /** A server switch must never send the old server's token to the new one. */
-export function saveSelectedServerUrl(url: string): boolean {
-  const previous = getSelectedServerUrl();
-  if (previous === url) return false;
+export function saveSelectedServerUrl(
+  url: string,
+  defaultUrl: string,
+): boolean {
+  const previous = getSelectedServerUrl() ?? defaultUrl;
+  if (previous === url) {
+    if (url === defaultUrl) localStorage.removeItem(MOBILE_SERVER_URL);
+    return false;
+  }
   localStorage.clear();
   sessionStorage.clear();
-  localStorage.setItem(MOBILE_SERVER_URL, url);
+  if (url !== defaultUrl) localStorage.setItem(MOBILE_SERVER_URL, url);
   return true;
 }

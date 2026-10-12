@@ -12,11 +12,7 @@ import { Toaster } from './components/ui/sonner';
 import { AuthConsumer, AuthProvider } from './contexts/auth';
 import { ChatbotProvider } from './contexts/chatbot';
 import router from './routes/sections';
-import { isCapacitor } from './utils/capacitor';
-import {
-  hasSelectedServer,
-  onOpenServerSelection,
-} from './utils/mobile-server';
+import { onOpenServerSelection } from './utils/mobile-server';
 import { queryClient } from './utils/query-client';
 
 function AppContent() {
@@ -36,9 +32,7 @@ function AppContent() {
 }
 
 function App() {
-  const [selectingServer, setSelectingServer] = useState(
-    isCapacitor() && !hasSelectedServer(),
-  );
+  const [selectingServer, setSelectingServer] = useState(false);
   useEffect(() => onOpenServerSelection(() => setSelectingServer(true)), []);
 
   return (
@@ -46,11 +40,7 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <StatusBarThemeSync />
         {selectingServer ? (
-          <ServerSelection
-            onCancel={
-              hasSelectedServer() ? () => setSelectingServer(false) : undefined
-            }
-          />
+          <ServerSelection onCancel={() => setSelectingServer(false)} />
         ) : (
           <AppContent />
         )}

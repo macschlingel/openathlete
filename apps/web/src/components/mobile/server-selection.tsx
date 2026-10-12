@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { m } from '@/paraglide/messages';
+import { getDefaultApiBaseUrl } from '@/utils/capacitor';
 import { signOutFirebase } from '@/utils/firebase-auth';
 import {
-  CLOUD_API_URL,
   getSelectedServerUrl,
   resolveServerUrl,
   saveSelectedServerUrl,
@@ -17,12 +17,13 @@ import { useState } from 'react';
 type Props = { onCancel?: () => void };
 
 export function ServerSelection({ onCancel }: Props) {
-  const current = getSelectedServerUrl();
-  const [choice, setChoice] = useState<'cloud' | 'custom'>(
-    current && current !== CLOUD_API_URL ? 'custom' : 'cloud',
+  const defaultUrl = getDefaultApiBaseUrl();
+  const current = getSelectedServerUrl() ?? defaultUrl;
+  const [choice, setChoice] = useState<'default' | 'custom'>(
+    current !== defaultUrl ? 'custom' : 'default',
   );
   const [serverInput, setServerInput] = useState(
-    current && current !== CLOUD_API_URL ? current : '',
+    current !== defaultUrl ? current : '',
   );
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
@@ -31,7 +32,7 @@ export function ServerSelection({ onCancel }: Props) {
     setError('');
     setPending(true);
     try {
-      let url = CLOUD_API_URL;
+      let url = defaultUrl;
       if (choice === 'custom') {
         try {
           serverUrlCandidates(serverInput);
@@ -47,7 +48,7 @@ export function ServerSelection({ onCancel }: Props) {
         );
         posthog.reset();
       }
-      if (saveSelectedServerUrl(url)) {
+      if (saveSelectedServerUrl(url, defaultUrl)) {
         window.location.reload();
       } else {
         onCancel?.();
@@ -79,17 +80,19 @@ export function ServerSelection({ onCancel }: Props) {
             <input
               type="radio"
               name="server-choice"
-              value="cloud"
-              checked={choice === 'cloud'}
-              onChange={() => setChoice('cloud')}
+              value="default"
+              checked={choice === 'default'}
+              onChange={() => setChoice('default')}
               className="mt-1"
             />
             <span>
               <span className="block font-medium">
-                {m.mobile_server_cloud()}
+                {defaultUrl === 'https://api.openathlete.org'
+                  ? m.mobile_server_cloud()
+                  : m.mobile_server_default()}
               </span>
               <span className="block text-sm text-muted-foreground">
-                {CLOUD_API_URL}
+                {defaultUrl}
               </span>
             </span>
           </label>
